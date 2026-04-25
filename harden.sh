@@ -398,15 +398,18 @@ SNIPPET
 # Block sensitive files — managed by forge-security
 # Include in site server blocks: include /etc/nginx/snippets/block-sensitive-files.conf;
 
-# Block access to hidden files (.env, .git, etc.)
-location ~ /\. {
+# Block access to hidden files (.env, .git, etc.) but allow .well-known (needed for SSL/ACME)
+location ~ /\.(?!well-known) {
     deny all;
     access_log off;
     log_not_found off;
 }
 
 # Block access to sensitive file types
-location ~* \.(sql|sqlite|log|env|yml|yaml|xml|ini|conf|bak|swp)$ {
+# Note: .xml is intentionally NOT blocked — sitemap.xml, rss.xml, atom.xml,
+# opensearch.xml, etc. are legitimately public files. Block specific XML
+# files at the application level if needed.
+location ~* \.(sql|sqlite|log|env|yml|yaml|ini|conf|bak|swp)$ {
     deny all;
     access_log off;
     log_not_found off;
